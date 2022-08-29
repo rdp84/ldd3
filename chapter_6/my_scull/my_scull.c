@@ -405,7 +405,7 @@ ssize_t my_scull_write(struct file *filp, const char __user *buf, size_t count,
   return retval;
 }
 
-int my_scull_ioctl(struct node *inode, struct file *filp,
+int my_scull_ioctl(struct inode *inode, struct file *filp,
                    unsigned int cmd, unsigned long arg)
 {
   int err = 0, tmp;
@@ -451,7 +451,7 @@ int my_scull_ioctl(struct node *inode, struct file *filp,
     break;
 
   case MY_SCULL_IOCGQUANTUM: /* Get: arg is pointer to the result */
-    retval = __put_user(my_scull_quantum, (int __user *) arg);
+    retval = __put_user(my_scull_quantum, (int __user *)arg);
     break;
 
   case MY_SCULL_IOCQQUANTUM: /* Query: return it (it's positive) */
@@ -466,17 +466,18 @@ int my_scull_ioctl(struct node *inode, struct file *filp,
       retval = __put_user(tmp, (int __user *)arg);
     break;
 
-  case SCULL_IOCHQUANTUM: /* sHift: like Tell + Query */
+  case MY_SCULL_IOCHQUANTUM: /* sHift: like Tell + Query */
     if (!capable(CAP_SYS_ADMIN))
       return -EPERM;
     tmp = my_scull_quantum;
     my_scull_quantum = arg;
     return tmp;
 
-  case MY_SCULL_IOCQSET:
+  case MY_SCULL_IOCSQSET:
     if (!capable(CAP_SYS_ADMIN))
       return -EPERM;
     retval = __get_user(my_scull_qset, (int __user *)arg);
+    break;
 
   case MY_SCULL_IOCTQSET:
     if (!capable(CAP_SYS_ADMIN))
@@ -522,6 +523,7 @@ static const struct file_operations my_scull_fops = {
   .release = my_scull_release,
   .read    = my_scull_read,
   .write   = my_scull_write,
+  .ioctl   = my_scull_ioctl,
 };
 
 /*
