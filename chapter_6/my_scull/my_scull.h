@@ -24,11 +24,15 @@
 
 
 #ifndef MY_SCULL_MAJOR
-#define MY_SCULL_MAJOR    0 /* dynamic major by default */
+#define MY_SCULL_MAJOR     0 /* dynamic major by default */
 #endif
 
 #ifndef MY_SCULL_NR_DEVS
-#define MY_SCULL_NR_DEVS  4 /* number of devices, myscull0 through myscull3*/
+#define MY_SCULL_NR_DEVS   4 /* number of devices, myscull0 through myscull3*/
+#endif
+
+#ifndef MY_SCULL_P_NR_DEVS
+#define MY_SCULL_P_NR_DEVS 4 /* number of pipe devices, myscullpipe0 through myscullpipe3  */
 #endif
 
 /*
@@ -47,6 +51,13 @@
 
 #ifndef MY_SCULL_QSET
 #define MY_SCULL_QSET     1000
+#endif
+
+/**
+ * The pipe device is a simple circular buffer. Here its default size
+ */
+#ifndef MY_SCULL_P_BUFFER
+#define MY_SCULL_P_BUFFER 4000
 #endif
 
 /*
@@ -68,14 +79,22 @@ struct my_scull_dev {
 
 /*
  * The different configurable parameters
- * Defined in main.c
  */
+
+/* Defined in my_scull.c */
 extern int my_scull_major;
 extern int my_scull_nr_devs;
+extern int my_scull_quantum;
+extern int my_scull_qset;
+
+/* Defined in my_pipe.c */
+extern int my_scull_p_buffer;
 
 /*
  * Prototypes for shared functions
  */
+int     my_scull_p_init(dev_t dev);
+void    my_scull_p_cleanup(void);
 int     my_scull_open(struct inode *inode, struct file *filp);
 int     my_scull_release(struct inode *inode, struct file *filp);
 ssize_t my_scull_read(struct file *filp, char __user *buf, size_t count,

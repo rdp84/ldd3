@@ -611,6 +611,10 @@ static int __init my_scull_init_module(void)
     my_scull_setup_cdev(&scull_devices[i], i);
   }
 
+  /* At this point call the init function for any friend device */
+  dev = MKDEV(my_scull_major, my_scull_minor + my_scull_nr_devs);
+  dev += my_scull_p_init(dev);
+
   PDEBUG("hello! %s:%i\n", __FILE__, __LINE__);
 
 #ifdef MY_SCULL_DEBUG /* only when debugging */
